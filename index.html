@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RENT SHOP - Accueil</title>
+  <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script-->
+  <script src="js/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .glassmorphism {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .neon-border {
+      box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5, 0 0 15px #4f46e5;
+    }
+    .hover-glow:hover {
+      box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5;
+    }
+    .gradient-text {
+      background: linear-gradient(to right, #4f46e5, #60a5fa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100 flex flex-col min-h-screen bg-gray-900">
+  <!-- Header Futuriste -->
+  <header class="glassmorphism py-4 px-6 fixed top-0 left-0 right-0 z-20">
+    <div class="container mx-auto flex justify-between items-center">
+      <a href="#" class="text-2xl font-bold flex items-center space-x-2 group">
+        <i class="fas fa-cube text-indigo-500 transform group-hover:rotate-180 transition-transform duration-500"></i>
+        <span class="gradient-text">RENT SHOP</span>
+      </a>
+      
+      <button onclick="toggleSidebar()" class="lg:hidden text-indigo-500 hover:text-indigo-400 transition-colors">
+        <i class="fas fa-bars text-2xl"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex pt-16">
+    <!-- Sidebar Futuriste -->
+    <nav id="sidebar" class="glassmorphism w-64 h-screen fixed p-5 space-y-4 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 z-10">
+      <div class="flex items-center justify-between mb-8">
+        <span class="text-xl font-bold text-indigo-400">Navigation</span>
+        <button onclick="toggleSidebar()" class="lg:hidden text-indigo-400 hover:text-indigo-300">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <ul class="space-y-3">
+        <li>
+          <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-home text-indigo-400"></i>
+            <span>Accueil</span>
+          </a>
+        </li>
+        <li>
+          <a href="marche.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-shopping-cart text-indigo-400"></i>
+            <span>Marchés</span>
+          </a>
+        </li>
+        <li>
+          <a href="boutiques.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-store text-indigo-400"></i>
+            <span>Boutiques</span>
+          </a>
+        </li>
+        <li>
+          <a href="paiments.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-credit-card text-indigo-400"></i>
+            <span>Paiements</span>
+          </a>
+        </li>
+        <li>
+          <a href="cat_paye.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-money-check-alt text-indigo-400"></i>
+            <span>Statut de payes</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <main class="flex-grow pt-20 p-6 lg:ml-64">
+      <div class="max-w-7xl mx-auto">
+        <!-- Section Héro -->
+        <section class="glassmorphism rounded-xl p-10 text-center mb-8 neon-border">
+          <h1 class="text-4xl font-bold mb-4 gradient-text">Bienvenue sur RENT SHOP</h1>
+          <p class="text-xl text-gray-300">Gérez facilement vos locations de boutiques et vos revenus.</p>
+        </section>
+
+        <!-- Métriques -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="glassmorphism rounded-xl p-6 hover-glow transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-indigo-400">Nombre de locataires</h2>
+              <i class="fas fa-users text-2xl text-indigo-500"></i>
+            </div>
+            <p class="text-3xl font-bold gradient-text">45</p>
+          </div>
+
+          <div class="glassmorphism rounded-xl p-6 hover-glow transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-indigo-400">Recettes du mois</h2>
+              <i class="fas fa-chart-line text-2xl text-indigo-500"></i>
+            </div>
+            <p class="text-3xl font-bold gradient-text">3000 €</p>
+          </div>
+
+          <div class="glassmorphism rounded-xl p-6 hover-glow transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-indigo-400">Recette journalière</h2>
+              <i class="fas fa-euro-sign text-2xl text-indigo-500"></i>
+            </div>
+            <p class="text-3xl font-bold gradient-text">100 €</p>
+          </div>
+        </div>
+
+        <!-- Graphique -->
+        <div class="glassmorphism rounded-xl p-6 neon-border">
+          <h2 class="text-xl font-bold text-indigo-400 mb-6">Évolution des recettes</h2>
+          <div id="revenue-chart" class="h-96"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    // Active menu item
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPage = window.location.pathname.split('/').pop();
+      const links = document.querySelectorAll('nav a');
+      links.forEach(link => {
+        if (link.getAttribute('href') === currentPage || 
+           (currentPage === '' && link.getAttribute('href') === 'index.html')) {
+          link.classList.add('bg-indigo-600/20', 'neon-border');
+        }
+      });
+
+      // Configuration du graphique
+      const ctx = document.getElementById('revenue-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+          datasets: [{
+            label: 'Recettes',
+            data: [500, 1000, 1500, 2000, 2500, 3000],
+            backgroundColor: 'rgba(79, 70, 229, 0.2)',
+            borderColor: 'rgba(79, 70, 229, 1)',
+            borderWidth: 2,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: 'rgba(255, 255, 255, 0.8)'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.8)'
+              }
+            },
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.8)'
+              }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

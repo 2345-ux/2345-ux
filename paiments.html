@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contrôle de Paiement</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .glassmorphism {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .neon-border {
+      box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5, 0 0 15px #4f46e5;
+    }
+    .hover-glow:hover {
+      box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100 flex flex-col min-h-screen bg-gray-900 cyber-grid">
+  <!-- Header Unique et Futuriste -->
+<header class="glassmorphism py-4 px-6 fixed top-0 left-0 right-0 z-20">
+  <div class="container mx-auto flex justify-between items-center">
+    <!-- Logo et Nom -->
+    <a href="#" class="text-2xl font-bold flex items-center space-x-2 group">
+      <i class="fas fa-cube text-indigo-500 transform group-hover:rotate-180 transition-transform duration-500"></i>
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-blue-500">RENT SHOP</span>
+    </a>
+    
+    <!-- Bouton Mobile -->
+    <button onclick="toggleSidebar()" class="lg:hidden text-indigo-500 hover:text-indigo-400 transition-colors">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+
+    <!-- Actions et Contrôle -->
+    <div class="hidden lg:flex items-center space-x-4">
+      <h1 class="text-xl font-bold text-indigo-500">Contrôle de Paiement</h1>
+      <div class="flex space-x-4">
+        <!-- Nouvelle Situation -->
+        <button onclick="openModal()" class="glassmorphism hover-glow py-2 px-4 rounded-full flex items-center space-x-2 transition-all duration-300">
+          <i class="fas fa-plus text-indigo-400"></i>
+          <span>Nouvelle Situation</span>
+        </button>
+        
+        <!-- Imprimer -->
+        <button class="glassmorphism hover-glow py-2 px-4 rounded-full flex items-center space-x-2 transition-all duration-300">
+          <i class="fas fa-print text-indigo-400"></i>
+          <span>Imprimer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+  <div class="flex pt-16">
+    <!-- Sidebar Futuriste -->
+    <nav id="sidebar" class="glassmorphism w-64 h-screen fixed p-5 space-y-4 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 z-10">
+      <div class="flex items-center justify-between mb-8">
+        <span class="text-xl font-bold text-indigo-400">Navigation</span>
+        <button onclick="toggleSidebar()" class="lg:hidden text-indigo-400 hover:text-indigo-300">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <ul class="space-y-3">
+        <li>
+          <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-home text-indigo-400"></i>
+            <span>Accueil</span>
+          </a>
+        </li>
+        <li>
+          <a href="marche.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-shopping-cart text-indigo-400"></i>
+            <span>Marchés</span>
+          </a>
+        </li>
+        <li>
+          <a href="boutiques.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-store text-indigo-400"></i>
+            <span>Boutiques</span>
+          </a>
+        </li>
+        <li>
+          <a href="paiments.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-credit-card text-indigo-400"></i>
+            <span>Paiements</span>
+          </a>
+        </li>
+        <li>
+          <a href="cat_paye.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+            <i class="fas fa-money-check-alt text-indigo-400"></i>
+            <span>Statut de payes</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  <!-- Main Content -->
+  <main class="flex-grow pt-20 p-6 lg:ml-64">
+    <div class="max-w-7xl mx-auto">
+      <!-- Recherche -->
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center space-x-4">
+          <input type="date" placeholder="Date début" class="glassmorphism py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+          <span class="text-indigo-400">à</span>
+          <input type="date" placeholder="Date fin" class="glassmorphism py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+          <button class="glassmorphism hover-glow py-2 px-4 rounded-lg text-indigo-400 transition-all duration-300">
+            <i class="fas fa-search"></i> Rechercher
+          </button>
+        </div>
+      </div>
+
+      <!-- Tableau des paiements -->
+      <div class="glassmorphism rounded-xl p-6 neon-border">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-indigo-500/30">
+              <th hidden class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Code</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Numéro Boutique</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Nom Locataire</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Montant Versé</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Date de Paiement</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Marchés</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Situation</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-indigo-500/30" id="payments-table-body">
+            <!-- Le contenu sera rempli dynamiquement -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal pour nouvelle situation de payement-->
+  <div id="paymentModal" class="fixed inset-0 hidden bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+    <div class="glassmorphism rounded-xl p-6 w-full max-w-md neon-border">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-indigo-400">Nouvelle Situation de Paiement</h2>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-gray-300 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="rental-payment-form" class="space-y-4">
+        <div id="message_paiement" class="text-center mb-4"></div>
+        <input hidden type="text" id="rental_code" name="rental_code" placeholder="Code" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+        <input type="text" id="shop_number" name="shop_number" placeholder="Numéro Boutique" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
+        <input type="text" id="tenant_name" name="tenant_name" placeholder="Nom du Locataire" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
+        <input type="number" id="montant_verse" name="montant_verse" placeholder="Montant versé" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
+        <input type="date" id="payment_date" name="payment_date" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
+        <div class="mb-4">
+          <input type="hidden" id="marche_id" name="marche_id" value="">
+            <select id="nom_marche" name="nom_marche"
+                class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all 
+                bg-gray-800/50 backdrop-blur-md text-white border border-gray-700/50 
+                hover:bg-gray-800/70 focus:bg-gray-700" 
+                onchange="updateMarcheId()">
+                <option value="" data-id="">-- Sélectionnez un marché --</option>
+                <!-- Dynamically populate options -->
+                <option value="Marché 1" data-id="1">Marché 1</option>
+                <option value="Marché 2" data-id="2">Marché 2</option>
+            </select>
+      </div>
+        <div>
+          <div class="mb-4">
+            <label for="situation_name" class="block text-sm font-medium text-indigo-400 mb-2">Nom Situation</label>
+            <select id="situation_name" name="situation_name" 
+                class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all 
+                bg-gray-800/50 backdrop-blur-md text-white border border-gray-700/50 
+                hover:bg-gray-800/70 focus:bg-gray-700" 
+                required>
+                <option value="" class="bg-gray-800 text-white">Chargement des situations...</option>
+            </select>
+          </div>
+        </div>        
+        <div class="flex justify-end space-x-3 pt-4">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg border border-gray-500 hover:border-gray-400 transition-colors">Annuler</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 transition-all">Ajouter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    function openModal() {
+      const modal = document.getElementById('paymentModal');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      loadMarkets();
+      loadSituations();
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('paymentModal');
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Fermeture du modal en cliquant à l'extérieur
+    document.getElementById('paymentModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Active menu item
+    document.addEventListener('DOMContentLoaded', function() {
+      const currentPage = window.location.pathname.split('/').pop();
+      const links = document.querySelectorAll('nav a');
+      links.forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+          link.classList.add('bg-indigo-600/20', 'neon-border');
+        }
+      });
+    });
+
+    document.getElementById('rental-payment-form').addEventListener('submit', function (e) {
+      e.preventDefault(); // Empêche la soumission classique du formulaire
+      console.log("Bouton Submit cliqué !"); // Debug pour vérifier l'attachement
+      submitForm(); // Appel de la fonction principale
+  });  
+
+// Configuration du débogage
+const DEBUG = true; // Mettre à false en production
+
+function submitForm() {
+  console.log("Début de submitForm");
+
+  const formData = {
+      numero_boutique: getElementValue('shop_number'),
+      nom_locataire: getElementValue('tenant_name'),
+      montant_verse: getElementValue('montant_verse'),
+      date_paiement: getElementValue('payment_date'),
+      situation: getElementValue('situation_name'),
+      nom_marche: getElementValue('nom_marche')
+  };
+
+  console.log("FormData récupéré :", formData);
+
+  // Vérification des champs vides
+  if (Object.values(formData).some(value => !value)) {
+      displayMessage('Veuillez remplir tous les champs.', 'error');
+      console.log("Un ou plusieurs champs sont vides.");
+      return;
+  }
+
+  // AJAX
+  console.log("Début de la requête AJAX.");
+  $.ajax({
+      type: 'POST',
+      url: 'add_rental_payment.php',
+      data: formData,
+      dataType: 'json',
+      success: function (response) {
+          console.log("Réponse reçue :", response);
+          if (response.status === 'success') {
+              displayMessage(response.message, 'success');
+              document.getElementById('rental-payment-form').reset();
+              getListePaiements(); // Rafraîchir la liste
+          } else {
+              displayMessage(response.message, 'error');
+          }
+      },
+      error: function (xhr, status, error) {
+          console.error("Erreur AJAX :", error);
+          displayMessage(`Erreur: ${error}`, 'error');
+      }
+  });
+}
+
+// Fonction pour récupérer la valeur d'un élément du DOM
+function getElementValue(elementId) {
+    const element = document.getElementById(elementId);
+    return element ? element.value.trim() : '';
+}
+
+// Fonction pour afficher les messages
+function displayMessage(message, type) {
+    const messageElement = document.getElementById('message_paiement');
+    const colorClass = type === 'success' ? 'text-green-500' : 'text-red-500';
+    messageElement.innerHTML = `<p class="${colorClass}">${message}</p>`;
+}
+// Fonction pour récupérer la valeur d'un champ du formulaire
+function getElementValue(elementId) {
+  const element = checkDOMElement(elementId);
+  return element ? element.value : '';
+}
+
+// Fonction de débogage
+function debug(message, data = null) {
+  if (DEBUG) {
+      const timestamp = new Date().toISOString();
+      if (data) {
+          console.group(`[${timestamp}] ${message}`);
+          console.log('Données:', data);
+          console.groupEnd();
+      } else {
+          console.log(`[${timestamp}] ${message}`);
+      }
+  }
+}
+
+// Fonction pour récupérer et afficher les paiements
+function getListePaiements() {
+  $.ajax({
+      url: 'get_rentpaye.php',
+      type: 'GET',
+      dataType: 'json',
+      success: function (response) {
+          const tableBody = checkDOMElement('payments-table-body');
+          if (!tableBody) return;
+
+          tableBody.innerHTML = ''; // Réinitialiser le contenu
+
+          // Vérification de la structure des données
+          if (response.donnees && response.donnees.length > 0) {
+              const rows = response.donnees.map(paiement => `
+                  <tr class="hover:bg-indigo-600/10 transition-colors">
+                      <td class="px-6 py-4" hidden>${paiement.code_location || ''}</td>
+                      <td class="px-6 py-4">${paiement.numero_boutique || ''}</td>
+                      <td class="px-6 py-4">${paiement.nom_locataire || ''}</td>
+                      <td class="px-6 py-4">${paiement.montant_verse || ''} CFA</td>
+                      <td class="px-6 py-4">${paiement.date_paiement || ''}</td>
+                      <td class="px-6 py-4">${paiement.nom_marche || ''}</td>
+                      <td class="px-6 py-4">${paiement.situation || ''}</td>
+                      <td class="px-6 py-4">
+                          <div class="flex space-x-3">
+                              <button class="text-blue-400 hover:text-blue-300 transition-colors" 
+                                      onclick="editPayment('${paiement.code_location}')">
+                                  <i class="fas fa-edit"></i>
+                              </button>
+                              <button class="text-red-400 hover:text-red-300 transition-colors" 
+                                      onclick="deletePayment('${paiement.code_location}')">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+                          </div>
+                      </td>
+                  </tr>
+              `);
+
+              // Ajout des lignes dans le DOM en une seule opération
+              tableBody.innerHTML = rows.join('');
+          } else {
+              tableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center">Aucun paiement trouvé.</td></tr>';
+          }
+      },
+      error: function (xhr, status, error) {
+          const tableBody = checkDOMElement('payments-table-body');
+          if (!tableBody) return;
+
+          tableBody.innerHTML =
+              `<tr><td colspan="8" class="px-6 py-4 text-center text-red-500">Erreur: ${error}</td></tr>`;
+          debug('Erreur AJAX lors de la récupération des paiements', { status, error, xhr });
+      }
+  });
+}
+
+    function loadMarkets() {
+      $.ajax({
+        url: 'get_markets.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+          const marketSelect = document.getElementById('nom_marche');
+          marketSelect.innerHTML = '<option value="">Sélectionnez un marché</option>';
+
+          if (response && response.donnees.length > 0) {
+            response.donnees.forEach(function(market) {
+              const option = `<option value="${market.id}">${market.nom_marche}</option>`;
+              marketSelect.innerHTML += option;
+            });
+          } else {
+            marketSelect.innerHTML = '<option value="">Aucun marché disponible</option>';
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Erreur lors du chargement des marchés:', error);
+          alert('Erreur lors du chargement des marchés. Veuillez réessayer.');
+        }
+      });
+    }
+
+    function loadSituations() {
+      debug('Démarrage du chargement des situations');
+      $.ajax({
+        url: 'get_situations.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+          debug('Réponse situations:', response);
+          const situationSelect = document.getElementById('situation_name');
+
+          try {
+            situationSelect.innerHTML = '<option value="">Sélectionnez une situation</option>';
+
+            if (response.status === 'success' && Array.isArray(response.donnees)) {
+              debug(`${response.donnees.length} situations trouvées`);
+
+              response.donnees.forEach((situation, index) => {
+                debug(`Traitement de la situation ${index + 1}`, situation);
+
+                if (!situation.code || !situation.situation_nom) {
+                  debug('⚠️ Données de situation invalides', situation);
+                  return;
+                }
+
+                const option = document.createElement('option');
+                option.value = situation.code;
+                option.textContent = situation.situation_nom;
+                option.title = situation.description || '';
+                option.className = "bg-gray-800 text-white";
+                situationSelect.appendChild(option);
+              });
+
+              debug('Toutes les situations ont été ajoutées au select');
+            } else {
+              debug('❌ Format de réponse invalide ou pas de données', response);
+              situationSelect.innerHTML = '<option value="">Aucune situation disponible</option>';
+            }
+          } catch (error) {
+            debug('❌ Erreur lors du traitement des données', error);
+            situationSelect.innerHTML = '<option value="">Erreur de traitement</option>';
+          }
+        },
+        error: function(xhr, status, error) {
+          debug('❌ Erreur AJAX', {
+            status: status,
+            error: error,
+            responseText: xhr.responseText,
+            statusCode: xhr.status,
+            statusText: xhr.statusText
+          });
+
+          const situationSelect = checkDOMElement('situation_name');
+          if (situationSelect) {
+            situationSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+          }
+
+          try {
+            const errorResponse = JSON.parse(xhr.responseText);
+            debug('Réponse d\'erreur parsée', errorResponse);
+          } catch (e) {
+            debug('Impossible de parser la réponse d\'erreur', {
+              error: e,
+              rawResponse: xhr.responseText
+            });
+          }
+        },
+        complete: function() {
+          debug('Requête AJAX terminée');
+        }
+      });
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+      debug('DOM chargé, initialisation...');
+      const modal = checkDOMElement('paymentModal');
+      if (modal) {
+        debug('Modal trouvé, ajout du listener');
+        modal.addEventListener('show.bs.modal', function() {
+          debug('Événement d\'ouverture du modal déclenché');
+          loadSituations();
+        });
+      } else {
+        debug('Modal non trouvé, chargement direct des situations');
+        loadSituations();
+      }
+    });
+
+    // Utilitaire de vérification de connectivité
+    function checkConnectivity() {
+      debug('Vérification de la connectivité', {
+        online: navigator.onLine,
+        userAgent: navigator.userAgent
+      });
+    }
+
+    // Écouteurs d'événements de connectivité
+    window.addEventListener('online', () => debug('🟢 Application en ligne'));
+    window.addEventListener('offline', () => debug('🔴 Application hors ligne'));
+
+    // Écoute des changements dans le select des situations
+    document.addEventListener('DOMContentLoaded', function() {
+      const situationSelect = checkDOMElement('situation_name');
+      if (situationSelect) {
+        situationSelect.addEventListener('change', function(e) {
+          debug('Situation sélectionnée', {
+            value: e.target.value,
+            text: e.target.options[e.target.selectedIndex].text
+          });
+        });
+      }
+    });
+
+    // Chargement initial des paiements
+    $(document).ready(function() {
+      getListePaiements();
+    });
+</script>
+</body>
+</html>

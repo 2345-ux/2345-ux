@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Boutiques</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .glassmorphism {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .neon-border {
+      box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5, 0 0 15px #4f46e5;
+    }
+    .hover-glow:hover {
+      box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5;
+    }
+  </style>
+</head>
+<body class="font-sans text-gray-100 flex flex-col min-h-screen bg-gray-900">
+
+<!-- Header -->
+<header class="glassmorphism py-4 px-6 fixed top-0 left-0 right-0 z-20">
+  <div class="container mx-auto flex justify-between items-center">
+    <a href="#" class="text-2xl font-bold flex items-center space-x-2 group">
+      <i class="fas fa-cube text-indigo-500 transform group-hover:rotate-180 transition-transform duration-500"></i>
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-blue-500">RENT SHOP</span>
+    </a>
+    <button onclick="toggleSidebar()" class="lg:hidden text-indigo-500 hover:text-indigo-400 transition-colors">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+    <div class="hidden lg:flex items-center space-x-4">
+      <h1 class="text-xl font-bold text-indigo-500">Gestion des boutiques</h1>
+      <div class="flex space-x-4">
+        <button onclick="openModal()" class="glassmorphism hover-glow py-2 px-4 rounded-full flex items-center space-x-2 transition-all duration-300">
+          <i class="fas fa-plus text-indigo-400"></i>
+          <span>Nouvelle Situation</span>
+        </button>
+        <button class="glassmorphism hover-glow py-2 px-4 rounded-full flex items-center space-x-2 transition-all duration-300">
+          <i class="fas fa-print text-indigo-400"></i>
+          <span>Imprimer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="flex pt-16">
+   <!-- Sidebar Futuriste -->
+   <nav id="sidebar" class="glassmorphism w-64 h-screen fixed p-5 space-y-4 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 z-10">
+    <div class="flex items-center justify-between mb-8">
+      <span class="text-xl font-bold text-indigo-400">Navigation</span>
+      <button onclick="toggleSidebar()" class="lg:hidden text-indigo-400 hover:text-indigo-300">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <ul class="space-y-3">
+      <li>
+        <a href="index.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+          <i class="fas fa-home text-indigo-400"></i>
+          <span>Accueil</span>
+        </a>
+      </li>
+      <li>
+        <a href="marche.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+          <i class="fas fa-shopping-cart text-indigo-400"></i>
+          <span>Marchés</span>
+        </a>
+      </li>
+      <li>
+        <a href="boutiques.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+          <i class="fas fa-store text-indigo-400"></i>
+          <span>Boutiques</span>
+        </a>
+      </li>
+      <li>
+        <a href="paiments.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+          <i class="fas fa-credit-card text-indigo-400"></i>
+          <span>Paiements</span>
+        </a>
+      </li>
+      <li>
+        <a href="cat_paye.html" class="flex items-center space-x-3 p-3 rounded-lg hover-glow transition-all duration-300 hover:bg-indigo-600/20">
+          <i class="fas fa-money-check-alt text-indigo-400"></i>
+          <span>Statut de payes</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-grow pt-20 p-6 lg:ml-64">
+    <div class="max-w-7xl mx-auto">
+      <!-- Tableau -->
+      <div class="glassmorphism rounded-xl p-6 neon-border overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-indigo-500/30">
+              <th hidden class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Code</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Numéro</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Nom Boutique</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Locataire</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Téléphone</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Loyer</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Localisation</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="shop-list">
+            <!-- Dynamique -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="shopModal" class="fixed inset-0 hidden bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+  <div class="glassmorphism rounded-xl p-6 w-full max-w-2xl neon-border">
+    <form id="shop-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Inputs -->
+      <input type="text" id="shop_code" name="shopCode" placeholder="Code" hidden class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="text" id="shop_number" name="shopNumber" placeholder="Numéro" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="text" id="shop_name" name="shopName" placeholder="Nom" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="text" id="tenant_name" name="tenantName" placeholder="Locataire" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="text" id="tenant_phone" name="tenantPhone" placeholder="Téléphone" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="text" id="shop_location" name="shopLocation" placeholder="Localisation" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="number" id="shop_rent" name="shopRent" placeholder="Loyer" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <select id="shop-market" name="shopMarket" onchange="checkNewMarketOption()">
+        <option value="">Sélectionnez...</option>
+        <option value="new">Créer...</option>
+      </select>
+
+      <!-- Bouton de soumission -->
+      <div class="col-span-1 md:col-span-2 flex justify-end">
+        <button type="submit" id="submit-shop" class="btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Fonction pour afficher ou cacher la barre latérale
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('-translate-x-full');
+}
+
+// Fonction pour ouvrir le modal
+function openModal() {
+  const modal = document.getElementById('shopModal');
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+// Fonction pour fermer le modal
+function closeModal() {
+  const modal = document.getElementById('shopModal');
+  modal.classList.add('hidden');
+  document.body.style.overflow = 'auto';
+}
+
+// Fermeture du modal au clic en dehors de celui-ci
+document.getElementById('shopModal').addEventListener('click', function (e) {
+  if (e.target === this) closeModal();
+});
+
+// Active le menu de la page actuelle
+document.addEventListener('DOMContentLoaded', function () {
+  const currentPage = window.location.pathname.split('/').pop();
+  const links = document.querySelectorAll('nav a');
+  links.forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+          link.classList.add('bg-indigo-600/20', 'neon-border');
+      }
+  });
+});
+
+// Ajout d'une nouvelle boutique
+$(document).ready(function () {
+  $('#btn_enregistrer_shop').on('click', function () {
+      // Récupération des données du formulaire
+      const shopData = {
+          shop_code: $('#shop_code').val(),
+          shop_number: $('#shop_number').val(),
+          shop_name: $('#shop_name').val(),
+          tenant_name: $('#tenant_name').val(),
+          tenant_phone: $('#tenant_phone').val(),
+          shop_rent: $('#shop_rent').val(),
+          shop_location: $('#shop_location').val(),
+          shop_market: $('#shop_market').val()
+      };
+
+      // Envoi des données via AJAX
+      $.ajax({
+          url: 'add_shoop.php', // URL de ton script PHP
+          type: 'POST',
+          data: shopData,
+          dataType: 'json',
+          success: function (response) {
+              if (response.status === 'success') {
+                  alert(response.message); // Message de succès
+                  $('#shop_form')[0].reset(); // Réinitialiser le formulaire
+                  closeModal(); // Fermer le modal
+                  getListeShops(); // Rafraîchir la liste des boutiques
+              } else {
+                  alert(response.message); // Message d'erreur
+              }
+          },
+          error: function (xhr) {
+              if (xhr.responseJSON && xhr.responseJSON.message) {
+                  alert("Erreur : " + xhr.responseJSON.message);
+              } else {
+                  alert("Erreur lors de l'enregistrement.");
+              }
+          }
+      });
+  });
+});
+
+// Fonction pour récupérer la liste des boutiques
+function getListeShops() {
+  $.ajax({
+      url: 'get_shop.php', // URL pour récupérer les boutiques
+      type: 'GET',
+      dataType: 'json',
+      success: function (response) {
+          $('#shop_list').empty(); // Vider la liste existante
+          
+          if (Array.isArray(response.donnees) && response.donnees.length > 0) {
+              response.donnees.forEach(function (shop) {
+                  var row = `
+                      <tr>
+                          <td class="px-6 py-4">${shop.shop_code || ''}</td>
+                          <td class="px-6 py-4">${shop.shop_number || ''}</td>
+                          <td class="px-6 py-4">${shop.shop_name || ''}</td>
+                          <td class="px-6 py-4">${shop.tenant_name || ''}</td>
+                          <td class="px-6 py-4">${shop.tenant_phone || ''}</td>
+                          <td class="px-6 py-4">${shop.shop_rent || ''}</td>
+                          <td class="px-6 py-4">${shop.shop_location || ''}</td>
+                          <td class="px-6 py-4">${shop.shop_market || ''}</td>
+                          <td class="px-6 py-4">
+                              <div class="flex space-x-3">
+                                  <button class="text-blue-400 hover:text-blue-300 transition-colors">
+                                      <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button class="text-red-400 hover:text-red-300 transition-colors">
+                                      <i class="fas fa-trash"></i>
+                                  </button>
+                              </div>
+                          </td>
+                      </tr>`;
+                  $('#shop_list').append(row);
+              });
+          } else {
+              $('#shop_list').append('<tr><td colspan="9">Aucune boutique trouvée.</td></tr>');
+          }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+          console.error('Erreur AJAX:', textStatus, errorThrown);
+          $('#shop_list').append('<tr><td colspan="9" style="color:red;">Erreur: ' + errorThrown + '</td></tr>');
+      }
+  });
+}
+
+// Charger la liste des boutiques au chargement de la page
+$(document).ready(function () {
+  getListeShops();
+});
+
+</script>
+</body>
+</html>

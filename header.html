@@ -1,0 +1,26 @@
+<header class="header">
+<!-- Sidebar et Main Content -->
+<div class="flex">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="bg-gray-800 text-white w-64 h-screen p-5 space-y-4 transition-transform transform -translate-x-full lg:translate-x-0 lg:relative fixed">
+      <button onclick="toggleSidebar()" class="block lg:hidden text-gray-300 hover:text-white mb-4">
+        &#x2715; Fermer
+      </button>
+      <h2 class="text-2xl font-bold mb-8">RENT SHOP</h2>
+      <ul class="space-y-2">
+        <li><a href="index.html" class="nav-link">Accueil</a></li>
+        <li><a href="marche.html" class="nav-link">Marchés</a></li>
+        <li><a href="boutiques.html" class="nav-link">Boutiques</a></li>
+        <li><a href="paiments.html" class="nav-link">Paiments</a></li>
+        <li><a href="cat_paye.html" class="nav-link">Statut de payes</a></li>
+      </ul>
+    </nav>
+</header>
+
+<script>
+        // Fonction pour basculer l'affichage du sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+          }
+</script>
