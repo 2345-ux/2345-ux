@@ -16,23 +16,17 @@ try {
 
     // Requête pour récupérer les paiements avec les informations supplémentaires
     $stmt = $pdo->query("
- SELECT 
-    p.code_location, 
-    p.numero_boutique, 
-    p.nom_locataire, 
-    p.montant_verse, 
-    p.date_paiement, 
-    p.situation, 
-    m.nom_marche
-FROM 
-    t_paiements p
-LEFT JOIN 
-    t_marche m 
-ON 
-    p.marche_id = m.id
-ORDER BY 
-    p.date_paiement DESC
-LIMIT 0, 25;
+SELECT 
+    t_payments.id, 
+    t_payments.shop_name, 
+    t_payments.tenant_name, 
+    t_payments.montant_verse, 
+    t_payments.payment_date, 
+    t_marche.nom_marche, 
+    t_situations.situation_nom
+FROM t_payments
+LEFT JOIN t_marche ON t_payments.nom_marche = t_marche.id
+LEFT JOIN t_situations ON t_payments.situation_name = t_situations.code
     ");
     $payments = $stmt->fetchAll();
 

@@ -120,7 +120,7 @@
           <thead>
             <tr class="border-b border-indigo-500/30">
               <th hidden class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Code</th>
-              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Numéro Boutique</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Nom Boutique</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Nom Locataire</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Montant Versé</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Date de Paiement</th>
@@ -149,7 +149,7 @@
       <form id="rental-payment-form" class="space-y-4">
         <div id="message_paiement" class="text-center mb-4"></div>
         <input hidden type="text" id="rental_code" name="rental_code" placeholder="Code" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-        <input type="text" id="shop_number" name="shop_number" placeholder="Numéro Boutique" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
+        <input type="text" id="shop_name" name="shop_name" placeholder="Nom Boutique" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
         <input type="text" id="tenant_name" name="tenant_name" placeholder="Nom du Locataire" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
         <input type="number" id="montant_verse" name="montant_verse" placeholder="Montant versé" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
         <input type="date" id="payment_date" name="payment_date" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" required>
@@ -185,325 +185,383 @@
       </form>
     </div>
   </div>
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('-translate-x-full');
-    }
 
-    function openModal() {
-      const modal = document.getElementById('paymentModal');
-      modal.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-      loadMarkets();
-      loadSituations();
-    }
 
-    function closeModal() {
-      const modal = document.getElementById('paymentModal');
-      modal.classList.add('hidden');
-      document.body.style.overflow = 'auto';
-    }
-
-    // Fermeture du modal en cliquant à l'extérieur
-    document.getElementById('paymentModal').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
-
-    // Active menu item
-    document.addEventListener('DOMContentLoaded', function() {
-      const currentPage = window.location.pathname.split('/').pop();
-      const links = document.querySelectorAll('nav a');
-      links.forEach(link => {
-        if (link.getAttribute('href') === currentPage) {
-          link.classList.add('bg-indigo-600/20', 'neon-border');
-        }
-      });
-    });
-
-    document.getElementById('rental-payment-form').addEventListener('submit', function (e) {
-      e.preventDefault(); // Empêche la soumission classique du formulaire
-      console.log("Bouton Submit cliqué !"); // Debug pour vérifier l'attachement
-      submitForm(); // Appel de la fonction principale
-  });  
-
+<script>
 // Configuration du débogage
 const DEBUG = true; // Mettre à false en production
 
-function submitForm() {
-  console.log("Début de submitForm");
-
-  const formData = {
-      numero_boutique: getElementValue('shop_number'),
-      nom_locataire: getElementValue('tenant_name'),
-      montant_verse: getElementValue('montant_verse'),
-      date_paiement: getElementValue('payment_date'),
-      situation: getElementValue('situation_name'),
-      nom_marche: getElementValue('nom_marche')
-  };
-
-  console.log("FormData récupéré :", formData);
-
-  // Vérification des champs vides
-  if (Object.values(formData).some(value => !value)) {
-      displayMessage('Veuillez remplir tous les champs.', 'error');
-      console.log("Un ou plusieurs champs sont vides.");
-      return;
-  }
-
-  // AJAX
-  console.log("Début de la requête AJAX.");
-  $.ajax({
-      type: 'POST',
-      url: 'add_rental_payment.php',
-      data: formData,
-      dataType: 'json',
-      success: function (response) {
-          console.log("Réponse reçue :", response);
-          if (response.status === 'success') {
-              displayMessage(response.message, 'success');
-              document.getElementById('rental-payment-form').reset();
-              getListePaiements(); // Rafraîchir la liste
-          } else {
-              displayMessage(response.message, 'error');
-          }
-      },
-      error: function (xhr, status, error) {
-          console.error("Erreur AJAX :", error);
-          displayMessage(`Erreur: ${error}`, 'error');
-      }
-  });
+// Fonction de débogage améliorée
+function debug(message, data = null) {
+    if (DEBUG) {
+        const timestamp = new Date().toISOString();
+        if (data) {
+            console.group(`[${timestamp}] ${message}`);
+            console.log('Données:', data);
+            console.groupEnd();
+        } else {
+            console.log(`[${timestamp}] ${message}`);
+        }
+    }
 }
 
-// Fonction pour récupérer la valeur d'un élément du DOM
+// Fonction de vérification d'élément DOM
+function checkDOMElement(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) {
+        debug(`❌ Élément non trouvé : ${elementId}`);
+        return null;
+    }
+    return element;
+}
+
+// Fonction de validation côté client
+function validateForm(formData) {
+    const validations = [
+        { field: 'nom_boutique', regex: /^[A-Za-z0-9]{1,20}$/, message: 'Nom de la boutique invalide' },
+        { field: 'nom_locataire', regex: /^[A-Za-zÀ-ÿ\s]{1,100}$/, message: 'Nom du locataire invalide' },
+        { field: 'montant_verse', regex: /^\d+(\.\d{1,2})?$/, message: 'Montant invalide' }
+    ];
+
+    for (let validation of validations) {
+        const value = formData[validation.field];
+        if (!validation.regex.test(value)) {
+            displayMessage(validation.message, 'error');
+            return false;
+        }
+    }
+    return true;
+}
+
+function submitForm() {
+    debug("Début de submitForm");
+
+    const formData = {
+        shop_name: getElementValue('shop_name'),
+        tenant_name: getElementValue('tenant_name'),
+        montant_verse: getElementValue('montant_verse'),
+        payment_date: getElementValue('payment_date'),
+        situation_name: getElementValue('situation_name'),
+        nom_marche: getElementValue('nom_marche'),
+        marche_id: getElementValue('marche_id') || null
+    };
+
+    debug("FormData récupéré", formData);
+
+    // Validation côté client
+    if (!validateForm(formData)) return;
+
+    // Requête AJAX sécurisée
+    $.ajax({
+        type: 'POST',
+        url: 'add_rental_payment.php',
+        data: formData,
+        dataType: 'json',
+        success: function (response) {
+            debug("Réponse reçue", response);
+            
+            // Modification ici pour correspondre au nouveau format PHP
+            if (response.status === 'success') {
+                displayMessage(response.message, 'success');
+                document.getElementById('rental-payment-form').reset();
+                getListePaiements();
+                closeModal();
+            } else {
+                displayMessage(response.message, 'error');
+            }
+        },
+        error: function (xhr, status, error) {
+            debug('Erreur AJAX', { status, error, xhr });
+            
+            // Gestion de l'erreur pour le nouveau format PHP
+            const errorMessage = xhr.responseJSON 
+                ? xhr.responseJSON.message 
+                : `Erreur: ${error}`;
+            
+            displayMessage(errorMessage, 'error');
+        }
+    });
+}
+
+// Validation du formulaires
+function validateForm(formData) {
+    const requiredFields = [
+        'shop_name', 
+        'tenant_name', 
+        'montant_verse', 
+        'payment_date', 
+        'situation_name', 
+        'nom_marche'
+    ];
+
+    for (let field of requiredFields) {
+        if (!formData[field] || formData[field].trim() === '') {
+            displayMessage(`Le champ ${field} est requis`, 'error');
+            return false;
+        }
+    }
+
+    // Validation supplémentaire du montant
+    if (isNaN(parseFloat(formData.montant_verse))) {
+        displayMessage('Le montant doit être un nombre valide', 'error');
+        return false;
+    }
+
+    return true;
+}
+
+// Empêcher la soumission standard du formulaire
+$(document).ready(function() {
+    $('#rental-payment-form').on('submit', function(e) {
+        e.preventDefault(); // Empêche la soumission standard
+        submitForm();
+        return false; // Doublement de la prévention
+    });
+});
+
+// Fonction utilitaire pour obtenir la valeur d'un élément
 function getElementValue(elementId) {
     const element = document.getElementById(elementId);
     return element ? element.value.trim() : '';
 }
 
-// Fonction pour afficher les messages
-function displayMessage(message, type) {
-    const messageElement = document.getElementById('message_paiement');
-    const colorClass = type === 'success' ? 'text-green-500' : 'text-red-500';
-    messageElement.innerHTML = `<p class="${colorClass}">${message}</p>`;
-}
-// Fonction pour récupérer la valeur d'un champ du formulaire
-function getElementValue(elementId) {
-  const element = checkDOMElement(elementId);
-  return element ? element.value : '';
-}
-
 // Fonction de débogage
-function debug(message, data = null) {
-  if (DEBUG) {
-      const timestamp = new Date().toISOString();
-      if (data) {
-          console.group(`[${timestamp}] ${message}`);
-          console.log('Données:', data);
-          console.groupEnd();
-      } else {
-          console.log(`[${timestamp}] ${message}`);
-      }
-  }
+function debug(message, data) {
+    console.log(message, data);
 }
 
-// Fonction pour récupérer et afficher les paiements
-function getListePaiements() {
-  $.ajax({
-      url: 'get_rentpaye.php',
-      type: 'GET',
-      dataType: 'json',
-      success: function (response) {
-          const tableBody = checkDOMElement('payments-table-body');
-          if (!tableBody) return;
-
-          tableBody.innerHTML = ''; // Réinitialiser le contenu
-
-          // Vérification de la structure des données
-          if (response.donnees && response.donnees.length > 0) {
-              const rows = response.donnees.map(paiement => `
-                  <tr class="hover:bg-indigo-600/10 transition-colors">
-                      <td class="px-6 py-4" hidden>${paiement.code_location || ''}</td>
-                      <td class="px-6 py-4">${paiement.numero_boutique || ''}</td>
-                      <td class="px-6 py-4">${paiement.nom_locataire || ''}</td>
-                      <td class="px-6 py-4">${paiement.montant_verse || ''} CFA</td>
-                      <td class="px-6 py-4">${paiement.date_paiement || ''}</td>
-                      <td class="px-6 py-4">${paiement.nom_marche || ''}</td>
-                      <td class="px-6 py-4">${paiement.situation || ''}</td>
-                      <td class="px-6 py-4">
-                          <div class="flex space-x-3">
-                              <button class="text-blue-400 hover:text-blue-300 transition-colors" 
-                                      onclick="editPayment('${paiement.code_location}')">
-                                  <i class="fas fa-edit"></i>
-                              </button>
-                              <button class="text-red-400 hover:text-red-300 transition-colors" 
-                                      onclick="deletePayment('${paiement.code_location}')">
-                                  <i class="fas fa-trash"></i>
-                              </button>
-                          </div>
-                      </td>
-                  </tr>
-              `);
-
-              // Ajout des lignes dans le DOM en une seule opération
-              tableBody.innerHTML = rows.join('');
-          } else {
-              tableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center">Aucun paiement trouvé.</td></tr>';
-          }
-      },
-      error: function (xhr, status, error) {
-          const tableBody = checkDOMElement('payments-table-body');
-          if (!tableBody) return;
-
-          tableBody.innerHTML =
-              `<tr><td colspan="8" class="px-6 py-4 text-center text-red-500">Erreur: ${error}</td></tr>`;
-          debug('Erreur AJAX lors de la récupération des paiements', { status, error, xhr });
-      }
+// Ajoutez un écouteur d'événement pour le formulaire
+$(document).ready(function() {
+  $('#rental-payment-form').on('submit', function(e) {
+      e.preventDefault(); // Empêche la soumission standard du formulaire
+      submitForm();
   });
-}
+});
 
-    function loadMarkets() {
-      $.ajax({
+// Fonctions de récupération des données
+
+function loadMarkets() {
+    debug('Chargement des marchés');
+    $.ajax({
         url: 'get_markets.php',
         type: 'GET',
         dataType: 'json',
         success: function(response) {
-          const marketSelect = document.getElementById('nom_marche');
-          marketSelect.innerHTML = '<option value="">Sélectionnez un marché</option>';
+            const marketSelect = checkDOMElement('nom_marche');
+            if (!marketSelect) return;
 
-          if (response && response.donnees.length > 0) {
-            response.donnees.forEach(function(market) {
-              const option = `<option value="${market.id}">${market.nom_marche}</option>`;
-              marketSelect.innerHTML += option;
-            });
-          } else {
-            marketSelect.innerHTML = '<option value="">Aucun marché disponible</option>';
-          }
+            marketSelect.innerHTML = '<option value="">-- Sélectionnez un marché --</option>';
+
+            if (response && response.donnees && response.donnees.length > 0) {
+                response.donnees.forEach(function(market) {
+                    const option = document.createElement('option');
+                    option.value = market.id;
+                    option.textContent = market.nom_marche;
+                    marketSelect.appendChild(option);
+                });
+            } else {
+                marketSelect.innerHTML = '<option value="">Aucun marché disponible</option>';
+            }
         },
         error: function(xhr, status, error) {
-          console.error('Erreur lors du chargement des marchés:', error);
-          alert('Erreur lors du chargement des marchés. Veuillez réessayer.');
+            debug('Erreur lors du chargement des marchés', { status, error });
+            alert('Erreur lors du chargement des marchés. Veuillez réessayer.');
         }
-      });
-    }
+    });
+}
 
-    function loadSituations() {
-      debug('Démarrage du chargement des situations');
-      $.ajax({
+function loadSituations() {
+    debug('Démarrage du chargement des situations');
+    $.ajax({
         url: 'get_situations.php',
         type: 'GET',
         dataType: 'json',
         success: function(response) {
-          debug('Réponse situations:', response);
-          const situationSelect = document.getElementById('situation_name');
+            const situationSelect = checkDOMElement('situation_name');
+            if (!situationSelect) return;
 
-          try {
-            situationSelect.innerHTML = '<option value="">Sélectionnez une situation</option>';
+            situationSelect.innerHTML = '<option value="">-- Sélectionnez une situation --</option>';
 
             if (response.status === 'success' && Array.isArray(response.donnees)) {
-              debug(`${response.donnees.length} situations trouvées`);
-
-              response.donnees.forEach((situation, index) => {
-                debug(`Traitement de la situation ${index + 1}`, situation);
-
-                if (!situation.code || !situation.situation_nom) {
-                  debug('⚠️ Données de situation invalides', situation);
-                  return;
-                }
-
-                const option = document.createElement('option');
-                option.value = situation.code;
-                option.textContent = situation.situation_nom;
-                option.title = situation.description || '';
-                option.className = "bg-gray-800 text-white";
-                situationSelect.appendChild(option);
-              });
-
-              debug('Toutes les situations ont été ajoutées au select');
+                response.donnees.forEach((situation) => {
+                    const option = document.createElement('option');
+                    option.value = situation.code;
+                    option.textContent = situation.situation_nom;
+                    option.title = situation.description || '';
+                    situationSelect.appendChild(option);
+                });
             } else {
-              debug('❌ Format de réponse invalide ou pas de données', response);
-              situationSelect.innerHTML = '<option value="">Aucune situation disponible</option>';
+                situationSelect.innerHTML = '<option value="">Aucune situation disponible</option>';
             }
-          } catch (error) {
-            debug('❌ Erreur lors du traitement des données', error);
-            situationSelect.innerHTML = '<option value="">Erreur de traitement</option>';
-          }
         },
         error: function(xhr, status, error) {
-          debug('❌ Erreur AJAX', {
-            status: status,
-            error: error,
-            responseText: xhr.responseText,
-            statusCode: xhr.status,
-            statusText: xhr.statusText
-          });
-
-          const situationSelect = checkDOMElement('situation_name');
-          if (situationSelect) {
-            situationSelect.innerHTML = '<option value="">Erreur de chargement</option>';
-          }
-
-          try {
-            const errorResponse = JSON.parse(xhr.responseText);
-            debug('Réponse d\'erreur parsée', errorResponse);
-          } catch (e) {
-            debug('Impossible de parser la réponse d\'erreur', {
-              error: e,
-              rawResponse: xhr.responseText
-            });
-          }
-        },
-        complete: function() {
-          debug('Requête AJAX terminée');
+            debug('Erreur lors du chargement des situations', { status, error });
+            const situationSelect = checkDOMElement('situation_name');
+            if (situationSelect) {
+                situationSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            }
         }
-      });
-    }
+    });
+}
 
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', function() {
-      debug('DOM chargé, initialisation...');
-      const modal = checkDOMElement('paymentModal');
-      if (modal) {
-        debug('Modal trouvé, ajout du listener');
-        modal.addEventListener('show.bs.modal', function() {
-          debug('Événement d\'ouverture du modal déclenché');
-          loadSituations();
-        });
-      } else {
-        debug('Modal non trouvé, chargement direct des situations');
+function getListePaiements() {
+    debug('Récupération de la liste des paiements');
+    $.ajax({
+        url: 'get_rentpaye.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            const tableBody = checkDOMElement('payments-table-body');
+            if (!tableBody) return;
+
+            tableBody.innerHTML = '';
+
+            if (response.donnees && response.donnees.length > 0) {
+                const rows = response.donnees.map(paiement => `
+                    <tr class="hover:bg-indigo-600/10 transition-colors">
+                        <td class="px-6 py-4" hidden>${paiement.code_location || ''}</td>
+                        <td class="px-6 py-4">${paiement.shop_name || ''}</td>
+                        <td class="px-6 py-4">${paiement.tenant_name || ''}</td>
+                        <td class="px-6 py-4">${paiement.montant_verse || ''} CFA</td>
+                        <td class="px-6 py-4">${paiement.payment_date || ''}</td>
+                        <td class="px-6 py-4">${paiement.nom_marche || ''}</td>
+                        <td class="px-6 py-4">${paiement.situation_nom || ''}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex space-x-3">
+                                <button class="text-blue-400 hover:text-blue-300 transition-colors" 
+                                        onclick="editPayment('${paiement.code_location}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-400 hover:text-red-300 transition-colors" 
+                                        onclick="deletePayment('${paiement.code_location}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+
+                tableBody.innerHTML = rows.join('');
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center">Aucun paiement trouvé.</td></tr>';
+            }
+        },
+        error: function (xhr, status, error) {
+            debug('Erreur lors de la récupération des paiements', { status, error });
+            const tableBody = checkDOMElement('payments-table-body');
+            if (tableBody) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-center text-red-500">
+                            Erreur: ${error}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+    });
+}
+
+// Fonctions utilitaires
+
+function getElementValue(elementId) {
+    const element = checkDOMElement(elementId);
+    return element ? element.value.trim() : '';
+}
+
+function displayMessage(message, type) {
+    const messageElement = checkDOMElement('message_paiement');
+    if (messageElement) {
+        messageElement.innerHTML = `
+            <p class="${type === 'success' ? 'text-green-500' : 'text-red-500'}">
+                ${message}
+            </p>
+        `;
+        setTimeout(() => {
+            if (messageElement) messageElement.innerHTML = '';
+        }, 5000);
+    }
+}
+
+// Fonctions de gestion du modal
+
+function toggleSidebar() {
+    const sidebar = checkDOMElement('sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('-translate-x-full');
+    }
+}
+
+function openModal() {
+    const modal = checkDOMElement('paymentModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        loadMarkets();
         loadSituations();
-      }
-    });
+    }
+}
 
-    // Utilitaire de vérification de connectivité
-    function checkConnectivity() {
-      debug('Vérification de la connectivité', {
-        online: navigator.onLine,
-        userAgent: navigator.userAgent
-      });
+function closeModal() {
+    const modal = checkDOMElement('paymentModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        const form = checkDOMElement('rental-payment-form');
+        if (form) form.reset();
+    }
+}
+
+// Fonctions supplémentaires (à implémenter)
+
+function editPayment(codeLocation) {
+    debug('Édition du paiement', { codeLocation });
+    // Implémenter la logique d'édition
+}
+
+function deletePayment(codeLocation) {
+    debug('Suppression du paiement', { codeLocation });
+    // Implémenter la logique de suppression
+}
+
+// Gestion des événements
+
+document.addEventListener('DOMContentLoaded', function() {
+    debug('DOM chargé, initialisation...');
+
+    // Écouteur pour le formulaire
+    const form = checkDOMElement('rental-payment-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitForm();
+        });
     }
 
-    // Écouteurs d'événements de connectivité
-    window.addEventListener('online', () => debug('🟢 Application en ligne'));
-    window.addEventListener('offline', () => debug('🔴 Application hors ligne'));
+    // Initialisation des champs
+    const paymentDateInput = checkDOMElement('payment_date');
+    if (paymentDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        paymentDateInput.max = today;
+    }
 
-    // Écoute des changements dans le select des situations
-    document.addEventListener('DOMContentLoaded', function() {
-      const situationSelect = checkDOMElement('situation_name');
-      if (situationSelect) {
-        situationSelect.addEventListener('change', function(e) {
-          debug('Situation sélectionnée', {
-            value: e.target.value,
-            text: e.target.options[e.target.selectedIndex].text
-          });
-        });
-      }
-    });
+    // Chargement initial
+    loadMarkets();
+    loadSituations();
+    getListePaiements();
+});
 
-    // Chargement initial des paiements
-    $(document).ready(function() {
-      getListePaiements();
+// Gestion de la connectivité
+window.addEventListener('online', () => debug('🟢 Application en ligne'));
+window.addEventListener('offline', () => debug('🔴 Application hors ligne'));
+
+// Fermeture du modal en cliquant à l'extérieur
+const modal = checkDOMElement('paymentModal');
+if (modal) {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
     });
+}
 </script>
 </body>
 </html>
