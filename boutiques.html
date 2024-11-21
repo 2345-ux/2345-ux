@@ -128,9 +128,9 @@
       <!-- Inputs -->
       <input type="text" id="shop_code" name="shopCode" placeholder="Code" hidden class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
       
-      <input type="text" id="shop_number" name="shopNumber" placeholder="Numéro" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="text" id="shop_number" name="shopNumber" placeholder="N° Boutique" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
       
-      <input type="text" id="shop_name" name="shopName" placeholder="Nom" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <input type="text" id="shop_name" name="shopName" placeholder="Nom Boutique" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
       
       <input type="text" id="tenant_name" name="tenantName" placeholder="Locataire" required class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
       
@@ -287,7 +287,7 @@ $(document).ready(function () {
 
       // Envoi des données via AJAX
       $.ajax({
-          url: 'add_shoop.php', // URL de ton script PHP
+          url: 'add_shop.php', // URL de ton script PHP
           type: 'POST',
           data: shopData,
           dataType: 'json',
