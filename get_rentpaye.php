@@ -17,7 +17,7 @@ try {
     // Requête pour récupérer les paiements avec les informations supplémentaires
     $stmt = $pdo->query("
 SELECT 
-    t_payments.id, 
+    t_payments.id_payment, 
     t_payments.shop_name, 
     t_payments.tenant_name, 
     t_payments.montant_verse, 

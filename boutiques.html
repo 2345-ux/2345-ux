@@ -143,11 +143,9 @@
       
       <input type="number" id="shop_rent" name="shopRent" placeholder="Loyer" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
       
-      <select id="shop-market" name="shopMarket" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" onchange="checkNewMarketOption()">
-        <option value="">Sélectionnez...</option>
-        <option value="new">Créer...</option>
-      </select>
-
+      <select id="shop_market" name="shopMarket" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+        <option value="">-- Sélectionnez un marché --</option>
+    </select>  
       <!-- Bouton de soumission -->
       <button type="submit" id="submit-shop" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Enregistrer</button>
       <button type="button" id="open-maps-btn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 ml-2 transition-colors">
@@ -158,209 +156,216 @@
 </div>
 
 <script>
-// Fonction pour afficher ou cacher la barre latérale
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.classList.toggle('-translate-x-full');
-}
-
-// Fonction pour ouvrir le modal
-function openModal() {
-  const modal = document.getElementById('shopModal');
-  modal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-
-// Fonction pour fermer le modal
-function closeModal() {
-  const modal = document.getElementById('shopModal');
-  modal.classList.add('hidden');
-  document.body.style.overflow = 'auto';
-}
-
-// Fermeture du modal au clic en dehors de celui-ci
-document.getElementById('shopModal').addEventListener('click', function (e) {
-  if (e.target === this) closeModal();
-});
-
-// Active le menu de la page actuelle
-document.addEventListener('DOMContentLoaded', function () {
-  const currentPage = window.location.pathname.split('/').pop();
-  const links = document.querySelectorAll('nav a');
-  links.forEach(link => {
-      if (link.getAttribute('href') === currentPage) {
+    // Fonction pour afficher ou cacher la barre latérale
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+    
+    // Fonction pour ouvrir le modal
+    function openModal() {
+      const modal = document.getElementById('shopModal');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    // Fonction pour fermer le modal
+    function closeModal() {
+      const modal = document.getElementById('shopModal');
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+    
+    // Fermeture du modal au clic en dehors de celui-ci
+    document.getElementById('shopModal').addEventListener('click', function (e) {
+      if (e.target === this) closeModal();
+    });
+    
+    // Active le menu de la page actuelle
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentPage = window.location.pathname.split('/').pop();
+      const links = document.querySelectorAll('nav a');
+      links.forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
           link.classList.add('bg-indigo-600/20', 'neon-border');
-      }
-  });
-});
-document.addEventListener('DOMContentLoaded', function() {
-  const shopLocationInput = document.getElementById('shop_location');
-  const latitudeInput = document.getElementById('shop_latitude');
-  const longitudeInput = document.getElementById('shop_longitude');
-  const shopForm = document.getElementById('shop-form');
-  const openMapsButton = document.getElementById('open-maps-btn');
-
-  // Function to get coordinates using geocoding
-  async function getCoordinates(location) {
-      try {
+        }
+      });
+    });
+    
+    // Ajout d'une nouvelle boutique
+    $(document).ready(function () {
+      // Fonction pour récupérer les coordonnées à l'aide de l'API OpenStreetMap
+      async function getCoordinates(location) {
+        try {
           const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
           const data = await response.json();
-          
+    
           if (data && data.length > 0) {
-              return {
-                  latitude: parseFloat(data[0].lat),
-                  longitude: parseFloat(data[0].lon)
-              };
+            return {
+              latitude: parseFloat(data[0].lat),
+              longitude: parseFloat(data[0].lon)
+            };
           }
           return null;
-      } catch (error) {
+        } catch (error) {
           console.error('Erreur de géocodage:', error);
           return null;
+        }
       }
-  }
-
-  // Function to open Google Maps with coordinates
-  function openGoogleMaps(latitude, longitude) {
-      if (latitude && longitude) {
+    
+      // Fonction pour ouvrir Google Maps avec des coordonnées
+      function openGoogleMaps(latitude, longitude) {
+        if (latitude && longitude) {
           const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=15`;
           window.open(googleMapsUrl, '_blank');
+        }
       }
-  }
-
-  // Event listener for "Open Maps" button
-  openMapsButton.addEventListener('click', function() {
-      const latitude = latitudeInput.value;
-      const longitude = longitudeInput.value;
-      
-      if (latitude && longitude) {
+    
+      // Événement pour le bouton "Voir sur Google Maps"
+      $('#open-maps-btn').on('click', function () {
+        const latitude = $('#shop_latitude').val();
+        const longitude = $('#shop_longitude').val();
+    
+        if (latitude && longitude) {
           openGoogleMaps(latitude, longitude);
-      } else {
-          alert('Aucune coordonnée disponible. Enregistrez d\'abord le magasin.');
-      }
-  });
-
-  // Event listener for form submission to save coordinates
-  shopForm.addEventListener('submit', async function(event) {
-      event.preventDefault(); // Prevent default form submission
-
-      const location = shopLocationInput.value.trim();
-      if (location) {
-          const coords = await getCoordinates(location);
+        } else {
+          alert("Les coordonnées ne sont pas encore disponibles. Veuillez d'abord enregistrer le magasin.");
+        }
+      });
+    
+      // Ajout d'une nouvelle boutique
+      $('#btn_enregistrer_shop').on('click', async function () {
+        // Récupération de la localisation
+        const shopLocation = $('#shop_location').val().trim();
+    
+        // Initialisation des coordonnées
+        let shopLatitude = '';
+        let shopLongitude = '';
+    
+        if (shopLocation) {
+          const coords = await getCoordinates(shopLocation);
           if (coords) {
-              latitudeInput.value = coords.latitude;
-              longitudeInput.value = coords.longitude;
-              
-              // Optional: You can add your form submission logic here
-              // For example, send data to a server or perform local storage
-              console.log('Coordonnées:', coords);
-              alert('Magasin enregistré avec succès!');
+            shopLatitude = coords.latitude;
+            shopLongitude = coords.longitude;
           } else {
-              alert('Impossible de trouver les coordonnées pour cette localisation.');
+            alert('Impossible de trouver les coordonnées pour cette localisation.');
+            return; // Stopper l'exécution si les coordonnées ne sont pas trouvées
           }
-      }
-  });
-
-  // Placeholder function for market selection
-  window.checkNewMarketOption = function() {
-      const marketSelect = document.getElementById('shop-market');
-      if (marketSelect.value === 'new') {
-          // Logic to handle creation of a new market
-          alert('Création d\'un nouveau marché');
-      }
-  };
-});
-// Ajout d'une nouvelle boutique
-$(document).ready(function () {
-  $('#btn_enregistrer_shop').on('click', function () {
-      // Récupération des données du formulaire
-      const shopData = {
+        }
+    
+        // Récupération des autres données du formulaire
+        const shopData = {
           shop_code: $('#shop_code').val(),
           shop_number: $('#shop_number').val(),
           shop_name: $('#shop_name').val(),
           tenant_name: $('#tenant_name').val(),
           tenant_phone: $('#tenant_phone').val(),
           shop_rent: $('#shop_rent').val(),
-          shop_location: $('#shop_location').val(),
-          shop_market: $('#shop_market').val()
-      };
-
-      // Envoi des données via AJAX
-      $.ajax({
+          shop_location: shopLocation,
+          shop_market: $('#shop_market').val(),
+          shop_latitude: shopLatitude,
+          shop_longitude: shopLongitude
+        };
+    
+        // Envoi des données via AJAX
+        $.ajax({
           url: 'add_shop.php', // URL de ton script PHP
           type: 'POST',
           data: shopData,
           dataType: 'json',
           success: function (response) {
-              if (response.status === 'success') {
-                  alert(response.message); // Message de succès
-                  $('#shop_form')[0].reset(); // Réinitialiser le formulaire
-                  closeModal(); // Fermer le modal
-                  getListeShops(); // Rafraîchir la liste des boutiques
-              } else {
-                  alert(response.message); // Message d'erreur
-              }
+            if (response.status === 'success') {
+              alert(response.message); // Message de succès
+              $('#shop_form')[0].reset(); // Réinitialiser le formulaire
+              closeModal(); // Fermer le modal
+              getListeShops(); // Rafraîchir la liste des boutiques
+            } else {
+              alert(response.message); // Message d'erreur
+            }
           },
           error: function (xhr) {
-              if (xhr.responseJSON && xhr.responseJSON.message) {
-                  alert("Erreur : " + xhr.responseJSON.message);
-              } else {
-                  alert("Erreur lors de l'enregistrement.");
-              }
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              alert("Erreur : " + xhr.responseJSON.message);
+            } else {
+              alert("Erreur lors de l'enregistrement.");
+            }
           }
+        });
       });
-  });
-});
-
-// Fonction pour récupérer la liste des boutiques
-function getListeShops() {
-  $.ajax({
-      url: 'get_shop.php', // URL pour récupérer les boutiques
-      type: 'GET',
-      dataType: 'json',
-      success: function (response) {
-          $('#shop_list').empty(); // Vider la liste existante
-          
-          if (Array.isArray(response.donnees) && response.donnees.length > 0) {
+    
+      // Fonction pour récupérer la liste des boutiques
+      function getListeShops() {
+        $.ajax({
+          url: 'get_shop.php', // URL pour récupérer les boutiques
+          type: 'GET',
+          dataType: 'json',
+          success: function (response) {
+            $('#shop_list').empty(); // Vider la liste existante
+    
+            if (Array.isArray(response.donnees) && response.donnees.length > 0) {
               response.donnees.forEach(function (shop) {
-                  var row = `
-                      <tr>
-                          <td class="px-6 py-4">${shop.shop_code || ''}</td>
-                          <td class="px-6 py-4">${shop.shop_number || ''}</td>
-                          <td class="px-6 py-4">${shop.shop_name || ''}</td>
-                          <td class="px-6 py-4">${shop.tenant_name || ''}</td>
-                          <td class="px-6 py-4">${shop.tenant_phone || ''}</td>
-                          <td class="px-6 py-4">${shop.shop_rent || ''}</td>
-                          <td class="px-6 py-4">${shop.shop_location || ''}</td>
-                          <td class="px-6 py-4">${shop.shop_market || ''}</td>
-                          <td class="px-6 py-4">
-                              <div class="flex space-x-3">
-                                  <button class="text-blue-400 hover:text-blue-300 transition-colors">
-                                      <i class="fas fa-edit"></i>
-                                  </button>
-                                  <button class="text-red-400 hover:text-red-300 transition-colors">
-                                      <i class="fas fa-trash"></i>
-                                  </button>
-                              </div>
-                          </td>
-                      </tr>`;
-                  $('#shop_list').append(row);
+                var row = `
+                  <tr>
+                    <td class="px-6 py-4">${shop.shop_code || ''}</td>
+                    <td class="px-6 py-4">${shop.shop_number || ''}</td>
+                    <td class="px-6 py-4">${shop.shop_name || ''}</td>
+                    <td class="px-6 py-4">${shop.tenant_name || ''}</td>
+                    <td class="px-6 py-4">${shop.tenant_phone || ''}</td>
+                    <td class="px-6 py-4">${shop.shop_rent || ''}</td>
+                    <td class="px-6 py-4">${shop.shop_location || ''}</td>
+                    <td class="px-6 py-4">${shop.shop_market || ''}</td>
+                    <td class="px-6 py-4">${shop.shop_latitude || ''}</td>
+                    <td class="px-6 py-4">${shop.shop_longitude || ''}</td>
+                  </tr>`;
+                $('#shop_list').append(row);
               });
-          } else {
-              $('#shop_list').append('<tr><td colspan="9">Aucune boutique trouvée.</td></tr>');
+            } else {
+              $('#shop_list').append('<tr><td colspan="10">Aucune boutique trouvée.</td></tr>');
+            }
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.error('Erreur AJAX:', textStatus, errorThrown);
+            $('#shop_list').append('<tr><td colspan="10" style="color:red;">Erreur: ' + errorThrown + '</td></tr>');
           }
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-          console.error('Erreur AJAX:', textStatus, errorThrown);
-          $('#shop_list').append('<tr><td colspan="9" style="color:red;">Erreur: ' + errorThrown + '</td></tr>');
+        });
       }
-  });
-}
-
-// Charger la liste des boutiques au chargement de la page
-$(document).ready(function () {
-  getListeShops();
-});
-
-</script>
+      // Fonctions de récupération des données
+      function loadMarkets() {
+        $.ajax({
+          url: 'get_markets.php',
+          type: 'GET', 
+          dataType: 'json',
+          success: function(response) {
+            const marketSelect = $('#shop_market');
+            marketSelect.empty();
+            marketSelect.append('<option value="">-- Sélectionnez un marché --</option>');
+      
+            // Modification ici pour utiliser response.donnees au lieu de response.data
+            if (response.status === 'success' && Array.isArray(response.donnees)) {
+              response.donnees.forEach(market => {
+                // Assurez-vous que ces noms de champs correspondent à votre table t_marche
+                marketSelect.append(`<option value="${market.id_marche}">${market.nom_marche}</option>`);
+              });
+            } else {
+              console.error('Aucun marché disponible');
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('Erreur AJAX:', error);
+            alert('Erreur lors du chargement des marchés.');
+          }
+        });
+      }
+      
+      // Appeler la fonction au chargement de la page
+      $(document).ready(function() {
+        loadMarkets();
+      });
+      
+      // Charger la liste des boutiques au chargement de la page
+      getListeShops();
+      });
+    
+    </script>    
 </body>
 </html>
