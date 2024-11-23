@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contrôle de Paiement</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="js/jquery-3.6.0.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -180,7 +180,7 @@
         </div>        
         <div class="flex justify-end space-x-3 pt-4">
           <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg border border-gray-500 hover:border-gray-400 transition-colors">Annuler</button>
-          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 transition-all">Ajouter</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 transition-all">Ajouter1</button>
         </div>
       </form>
     </div>
@@ -232,111 +232,109 @@ function validateForm(formData) {
     }
     return true;
 }
-
+// fonction d'envoi de formulaire
 function submitForm() {
-    debug("Début de submitForm");
+  debug("Début de submitForm");
 
-    const formData = {
-        shop_name: getElementValue('shop_name'),
-        tenant_name: getElementValue('tenant_name'),
-        montant_verse: getElementValue('montant_verse'),
-        payment_date: getElementValue('payment_date'),
-        situation_name: getElementValue('situation_name'),
-        nom_marche: getElementValue('nom_marche'),
-        marche_id: getElementValue('marche_id') || null
-    };
+  // Collecter les données du formulaire
+  const formData = {
+      shop_name: getElementValue('shop_name'),
+      tenant_name: getElementValue('tenant_name'),
+      montant_verse: getElementValue('montant_verse'),
+      payment_date: getElementValue('payment_date'),
+      situation_name: getElementValue('situation_name'),
+      nom_marche: getElementValue('nom_marche'),
+      marche_id: getElementValue('marche_id') || null
+  };
 
-    debug("FormData récupéré", formData);
+  debug("FormData récupéré", formData);
 
-    // Validation côté client
-    if (!validateForm(formData)) return;
+  // Validation côté client
+  if (!validateForm(formData)) return;
 
-    // Requête AJAX sécurisée
-    $.ajax({
-        type: 'POST',
-        url: 'add_rental_payment.php',
-        data: formData,
-        dataType: 'json',
-        success: function (response) {
-            debug("Réponse reçue", response);
-            
-            // Modification ici pour correspondre au nouveau format PHP
-            if (response.status === 'success') {
-                displayMessage(response.message, 'success');
-                document.getElementById('rental-payment-form').reset();
-                getListePaiements();
-                closeModal();
-            } else {
-                displayMessage(response.message, 'error');
-            }
-        },
-        error: function (xhr, status, error) {
-            debug('Erreur AJAX', { status, error, xhr });
-            
-            // Gestion de l'erreur pour le nouveau format PHP
-            const errorMessage = xhr.responseJSON 
-                ? xhr.responseJSON.message 
-                : `Erreur: ${error}`;
-            
-            displayMessage(errorMessage, 'error');
-        }
-    });
+  // Désactiver le bouton pour éviter les soumissions multiples
+  const submitButton = document.querySelector('#submit-button');
+  if (submitButton) submitButton.disabled = true;
+
+  // Requête AJAX sécurisée
+  $.ajax({
+      type: 'POST',
+      url: 'add_rental_payment.php',
+      data: formData,
+      dataType: 'json',
+      success: function (response) {
+          debug("Réponse reçue", response);
+
+          if (response.status === 'success') {
+              displayMessage(response.message, 'success');
+              document.getElementById('rental-payment-form').reset();
+              getListePaiements();
+              closeModal();
+          } else {
+              displayMessage(response.message, 'error');
+          }
+      },
+      error: function (xhr, status, error) {
+          debug('Erreur AJAX', { status, error, xhr });
+
+          const errorMessage = xhr.responseJSON 
+              ? xhr.responseJSON.message 
+              : `Erreur: ${error}`;
+          displayMessage(errorMessage, 'error');
+      },
+      complete: function () {
+          // Réactiver le bouton après la requête
+          if (submitButton) submitButton.disabled = false;
+      }
+  });
 }
 
-// Validation du formulaires
+// Validation du formulaire
 function validateForm(formData) {
-    const requiredFields = [
-        'shop_name', 
-        'tenant_name', 
-        'montant_verse', 
-        'payment_date', 
-        'situation_name', 
-        'nom_marche'
-    ];
+  const requiredFields = [
+      'shop_name', 
+      'tenant_name', 
+      'montant_verse', 
+      'payment_date', 
+      'situation_name', 
+      'nom_marche'
+  ];
 
-    for (let field of requiredFields) {
-        if (!formData[field] || formData[field].trim() === '') {
-            displayMessage(`Le champ ${field} est requis`, 'error');
-            return false;
-        }
-    }
+  for (let field of requiredFields) {
+      if (!formData[field] || formData[field].trim() === '') {
+          displayMessage(`Le champ ${field} est requis`, 'error');
+          return false;
+      }
+  }
 
-    // Validation supplémentaire du montant
-    if (isNaN(parseFloat(formData.montant_verse))) {
-        displayMessage('Le montant doit être un nombre valide', 'error');
-        return false;
-    }
+  // Validation supplémentaire pour le montant
+  if (isNaN(parseFloat(formData.montant_verse))) {
+      displayMessage('Le montant doit être un nombre valide', 'error');
+      return false;
+  }
 
-    return true;
+  return true;
 }
-
-// Empêcher la soumission standard du formulaire
-$(document).ready(function() {
-    $('#rental-payment-form').on('submit', function(e) {
-        e.preventDefault(); // Empêche la soumission standard
-        submitForm();
-        return false; // Doublement de la prévention
-    });
-});
 
 // Fonction utilitaire pour obtenir la valeur d'un élément
 function getElementValue(elementId) {
-    const element = document.getElementById(elementId);
-    return element ? element.value.trim() : '';
+  const element = document.getElementById(elementId);
+  return element ? element.value.trim() : '';
 }
 
 // Fonction de débogage
 function debug(message, data) {
-    console.log(message, data);
+  console.log(message, data);
 }
 
-// Ajoutez un écouteur d'événement pour le formulaire
+// Empêcher la soumission standard et garantir une seule écoute
 $(document).ready(function() {
-  $('#rental-payment-form').on('submit', function(e) {
-      e.preventDefault(); // Empêche la soumission standard du formulaire
-      submitForm();
+  $('#rental-payment-form').off('submit').on('submit', function(e) {
+      e.preventDefault(); // Empêcher la soumission standard
+      submitForm(); // Appeler la fonction de soumission personnalisée
   });
 });
+
 
 // Fonctions de récupération des données
 
