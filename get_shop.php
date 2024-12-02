@@ -14,7 +14,8 @@ try {
     // Requête pour récupérer les boutiques avec les détails du marché
     $stmt = $pdo->prepare("
         SELECT 
-            t_shop.shop_code, 
+            t_shop.shop_code,
+            t_shop.shop_number,
             t_shop.shop_name, 
             t_shop.tenant_name, 
             t_shop.tenant_phone, 

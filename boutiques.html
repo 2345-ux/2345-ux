@@ -117,8 +117,8 @@
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Numéro</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Nom Boutique</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Locataire</th>
-              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Téléphone</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Loyer</th>
+              <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Téléphone</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Localisation</th>
               <th class="px-6 py-4 text-left text-sm text-indigo-400 uppercase tracking-wider">Actions</th>
             </tr>
@@ -314,11 +314,11 @@
         response.donnees.forEach(shop => {
           const row = `
             <tr>
-              <td hidden>${shop.shop_code || ''}</td>
+              <td>${shop.shop_number || ''}</td>
               <td>${shop.shop_name || ''}</td>
               <td>${shop.tenant_name || ''}</td>
-              <td>${shop.tenant_phone || ''}</td>
               <td>${shop.shop_rent || ''}</td>
+              <td>${shop.tenant_phone || ''}</td>
               <td>
                 ${shop.shop_location ? `<a href="https://www.google.com/maps?q=${encodeURIComponent(shop.shop_location)}" target="_blank" class="text-blue-500 underline">${shop.shop_location}</a>` : ''}
               </td>
