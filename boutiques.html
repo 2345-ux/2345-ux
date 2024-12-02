@@ -19,6 +19,18 @@
     .hover-glow:hover {
       box-shadow: 0 0 5px #4f46e5, 0 0 10px #4f46e5;
     }
+    .location-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6366f1; /* Indigo color to match your design */
+  }
+  .location-container {
+      position: relative;
+      width: 100%;
+  }
   </style>
 </head>
 <body class="font-sans text-gray-100 flex flex-col min-h-screen bg-gray-900">
@@ -38,7 +50,7 @@
       <div class="flex space-x-4">
         <button onclick="openModal()" class="glassmorphism hover-glow py-2 px-4 rounded-full flex items-center space-x-2 transition-all duration-300">
           <i class="fas fa-plus text-indigo-400"></i>
-          <span>Nouvelle Situation</span>
+          <span>Nouvelle Boutique</span>
         </button>
         <button class="glassmorphism hover-glow py-2 px-4 rounded-full flex items-center space-x-2 transition-all duration-300">
           <i class="fas fa-print text-indigo-400"></i>
@@ -135,21 +147,50 @@
       
       <input type="text" id="tenant_phone" name="tenantPhone" placeholder="Téléphone" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
       
-      <input type="text" id="shop_location" name="shopLocation" placeholder="Localisation" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+      <div class="location-container relative">
+        <input type="text" id="shop_location" name="shopLocation" placeholder="Localisation" 
+               class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all w-full pr-10">
+        <svg id="location-picker-icon" xmlns="http://www.w3.org/2000/svg" 
+             class="absolute right-3 top-1/2 transform -translate-y-1/2 h-6 w-6 cursor-pointer text-indigo-500" 
+             fill="none" viewBox="0 0 24 24" 
+             stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
       
       <input type="number" id="shop_rent" name="shopRent" placeholder="Loyer" class="glassmorphism px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
       
-      <select id="shop_market" name="shopMarket" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all 
+      <select id="id_marche" name="shopMarket" class="glassmorphism w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all 
       bg-gray-800/50 backdrop-blur-md text-white border border-gray-700/50 
       hover:bg-gray-800/70 focus:bg-gray-700" 
       onchange="updateMarcheId()">
         <option value="">-- Sélectionnez un marché --</option>
-    </select>  
+      </select>  
+      
       <!-- Bouton de soumission -->
-      <button type="submit" id="btn_enregistrer_shop" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">Enregistrer</button>
+      <button type="submit" id="btn_enregistrer_shop" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors col-span-1 md:col-span-2">Enregistrer</button>
     </form>
   </div>
 </div>
+
+<style>
+  .location-container {
+    position: relative;
+    width: 100%;
+  }
+  .location-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6366f1; /* Indigo color to match your design */
+  }
+</style>
+
 <script>
   // Fonction pour basculer la barre latérale
   function toggleSidebar() {
@@ -185,6 +226,33 @@
       }
     });
 
+    // Gestionnaire d'événements pour l'icône de localisation
+    const locationInput = document.getElementById('shop_location');
+    const locationIcon = document.getElementById('location-picker-icon');
+
+    locationIcon.addEventListener('click', () => {
+      // Coordonnées centrées sur le Niger (Niamey)
+      const nigerLat = 13.5137;
+      const nigerLng = 2.1098;
+
+      // Ouvrir Google Maps avec les coordonnées du Niger
+      const googleMapsUrl = `https://www.google.com/maps?q=${nigerLat},${nigerLng}&z=6`;
+      
+      // Ouvrir Google Maps dans un nouvel onglet
+      const newWindow = window.open(googleMapsUrl, '_blank');
+      
+      // Ajouter un écouteur pour capturer la position sélectionnée
+      window.addEventListener('message', (event) => {
+        if (event.origin !== 'https://www.google.com') return;
+        
+        const locationData = event.data;
+        if (locationData && locationData.location) {
+          const { lat, lng } = locationData.location;
+          locationInput.value = `${lat}, ${lng}`;
+        }
+      }, { once: true });
+    });
+
     // Charger les marchés et les boutiques au démarrage
     loadMarkets();
     loadShops();
@@ -204,13 +272,13 @@
         tenantPhone: $('#tenant_phone').val(),
         shopLocation: $('#shop_location').val(),
         shopRent: parseFloat($('#shop_rent').val()) || 0,
-        shopMarket: $('#shop_market').val()
+        id_marche: $('#id_marche').val()
       };
 
       console.log('Données envoyées :', formData);
 
       // Validation des champs obligatoires
-      if (!formData.shopName || !formData.shopLocation || !formData.shopMarket) {
+      if (!formData.shopName || !formData.shopLocation || !formData.id_marche) {
         alert('Veuillez remplir tous les champs obligatoires.');
         return;
       }
@@ -239,7 +307,7 @@
 
   // Fonction pour charger les boutiques
   function loadShops() {
-    $.get('get_shops.php', function (response) {
+    $.get('get_shop.php', function (response) {
       const tbody = $('#shop-list').empty();
 
       if (response.donnees?.length) {
@@ -247,12 +315,14 @@
           const row = `
             <tr>
               <td hidden>${shop.shop_code || ''}</td>
-              <td>${shop.shop_number || ''}</td>
               <td>${shop.shop_name || ''}</td>
               <td>${shop.tenant_name || ''}</td>
               <td>${shop.tenant_phone || ''}</td>
               <td>${shop.shop_rent || ''}</td>
-              <td>${shop.shop_location || ''}</td>
+              <td>
+                ${shop.shop_location ? `<a href="https://www.google.com/maps?q=${encodeURIComponent(shop.shop_location)}" target="_blank" class="text-blue-500 underline">${shop.shop_location}</a>` : ''}
+              </td>
+              <td>${shop.nom_marche || ''}</td>
               <td>
                 <div class="flex space-x-3">
                   <button class="text-blue-400 hover:text-blue-300 transition-colors" onclick="editShop(this)">
@@ -282,19 +352,32 @@
       type: 'GET',
       dataType: 'json',
       success: function (response) {
-        const marketSelect = $('#shop_market').empty();
-        if (response.status === 'success' && response.donnees?.length) {
-          marketSelect.append('<option value="">-- Sélectionnez un marché --</option>');
-          response.donnees.forEach(market => {
-            marketSelect.append(`<option value="${market.id}">${market.nom_marche}</option>`);
+        const marketSelect = document.getElementById('id_marche');
+        
+        if (!marketSelect) {
+          console.error("L'élément 'nom du marche' est introuvable.");
+          return;
+        }
+
+        // Réinitialisation de la liste déroulante
+        marketSelect.innerHTML = '<option value="">-- Sélectionnez un marché --</option>';
+
+        // Vérifiez si les données sont disponibles
+        if (response && response.donnees && response.donnees.length > 0) {
+          response.donnees.forEach(function (market) {
+            const option = document.createElement('option');
+            option.value = market.id;
+            option.textContent = market.nom_marche;
+            marketSelect.appendChild(option);
           });
         } else {
-          marketSelect.append('<option value="">Aucun marché disponible</option>');
+          // Aucun marché disponible
+          marketSelect.innerHTML = '<option value="">Aucun marché disponible</option>';
         }
       },
-      error: function (xhr) {
-        console.error('Erreur AJAX :', xhr.responseText);
-        $('#shop_market').html('<option value="">Erreur lors du chargement des marchés</option>');
+      error: function (xhr, status, error) {
+        console.error('Erreur AJAX :', error);
+        alert('Une erreur est survenue lors du chargement des marchés. Vérifiez votre connexion ou le script côté serveur.');
       }
     });
   }

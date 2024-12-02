@@ -44,7 +44,7 @@ try {
     $tenant_phone = trim($_POST['tenantPhone'] ?? null);
     $shop_rent = filter_var($_POST['shopRent'] ?? null, FILTER_VALIDATE_FLOAT);
     $shop_location = trim($_POST['shopLocation'] ?? null);
-    $id_marche = trim($_POST['idMarche'] ?? null);
+    $id_marche = trim($_POST['id_marche'] ?? null);
 
     // Champs obligatoires
 if (!$shop_name) {
