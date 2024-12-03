@@ -231,28 +231,31 @@
     const locationIcon = document.getElementById('location-picker-icon');
 
     locationIcon.addEventListener('click', () => {
-      // Coordonnées centrées sur le Niger (Niamey)
-      const nigerLat = 13.5137;
-      const nigerLng = 2.1098;
-
-      // Ouvrir Google Maps avec les coordonnées du Niger
-      const googleMapsUrl = `https://www.google.com/maps?q=${nigerLat},${nigerLng}&z=6`;
-      
-      // Ouvrir Google Maps dans un nouvel onglet
-      const newWindow = window.open(googleMapsUrl, '_blank');
-      
-      // Ajouter un écouteur pour capturer la position sélectionnée
-      window.addEventListener('message', (event) => {
-        if (event.origin !== 'https://www.google.com') return;
-        
-        const locationData = event.data;
-        if (locationData && locationData.location) {
-          const { lat, lng } = locationData.location;
-          locationInput.value = `${lat}, ${lng}`;
-        }
-      }, { once: true });
+      // Vérifier si la géolocalisation est supportée par le navigateur
+      if (navigator.geolocation) {
+        // Demander la localisation actuelle de l'utilisateur
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            // Récupérer les coordonnées de l'utilisateur
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+    
+            // Ouvrir Google Maps avec les coordonnées de l'utilisateur
+            const googleMapsUrl = `https://www.google.com/maps?q=${userLat},${userLng}&z=15`; // Zoom ajusté à 15
+            window.open(googleMapsUrl, '_blank');
+          },
+          (error) => {
+            // Gérer les erreurs de géolocalisation
+            console.error('Erreur lors de l\'obtention de la localisation:', error.message);
+            alert('Impossible de récupérer votre localisation. Vérifiez vos paramètres ou autorisez l\'accès.');
+          }
+        );
+      } else {
+        // Si la géolocalisation n'est pas supportée
+        alert('La géolocalisation n\'est pas supportée par votre navigateur.');
+      }
     });
-
+    
     // Charger les marchés et les boutiques au démarrage
     loadMarkets();
     loadShops();

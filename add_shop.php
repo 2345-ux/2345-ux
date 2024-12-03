@@ -101,9 +101,10 @@ if (!$id_marche) {
 
     echo json_encode([
         'status' => 'success',
-        'message' => 'Boutique ajoutée avec succès.',
-        'shopCode' => $shop_code,
-        'id' => $pdo->lastInsertId()
+        'data' => [
+            'code' => $shop_code,
+            'id' => $pdo->lastInsertId()
+        ]
     ]);
 } catch (PDOException $e) {
     error_log("Erreur PDO : " . $e->getMessage());
